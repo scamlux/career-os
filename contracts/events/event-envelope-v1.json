@@ -1,0 +1,19 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "careeros.event-envelope.v1",
+  "type": "object",
+  "required": ["event_id", "event_type", "event_version", "occurred_at", "source", "tenant_id", "payload"],
+  "properties": {
+    "event_id": { "type": "string", "format": "uuid" },
+    "event_type": { "type": "string" },
+    "event_version": { "type": "integer", "minimum": 1 },
+    "occurred_at": { "type": "string", "format": "date-time" },
+    "source": { "type": "string" },
+    "correlation_id": { "type": "string" },
+    "request_id": { "type": "string" },
+    "tenant_id": { "type": "string" },
+    "user_id": { "type": "string" },
+    "payload": { "type": "object" }
+  },
+  "additionalProperties": false
+}

@@ -1,0 +1,21 @@
+syntax = "proto3";
+
+package careeros.analytics.v1;
+
+import "common.proto";
+
+service AnalyticsService {
+  rpc GetKpiSnapshot(GetKpiSnapshotRequest) returns (GetKpiSnapshotResponse);
+}
+
+message GetKpiSnapshotRequest {
+  careeros.common.v1.RequestMeta meta = 1;
+  string tenant_id = 2;
+}
+
+message GetKpiSnapshotResponse {
+  int64 dau = 1;
+  int64 wau = 2;
+  double churn_risk_score = 3;
+  double mrr_usd = 4;
+}

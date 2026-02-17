@@ -1,0 +1,66 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: user-profile-service
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: user-profile-service
+  template:
+    metadata:
+      labels:
+        app: user-profile-service
+    spec:
+      containers:
+        - name: user-profile-service
+          image: careeros/user-profile-service:latest
+          ports:
+            - containerPort: 8080
+            - containerPort: 50051
+          envFrom:
+            - configMapRef:
+                name: platform-config
+          env:
+            - name: SERVICE_NAME
+              value: user-profile-service
+            - name: GRPC_PORT
+              value: "50051"
+            - name: HTTP_PORT
+              value: "8080"
+            - name: DATABASE_URL
+              value: postgres://postgres:postgres@user-profile-db.careeros.svc.cluster.local:5432/user_profile
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: user-profile-service
+spec:
+  selector:
+    app: user-profile-service
+  ports:
+    - name: http
+      port: 8080
+      targetPort: 8080
+    - name: grpc
+      port: 50051
+      targetPort: 50051
+---
+apiVersion: autoscaling/v2
+kind: HorizontalPodAutoscaler
+metadata:
+  name: user-profile-service
+spec:
+  scaleTargetRef:
+    apiVersion: apps/v1
+    kind: Deployment
+    name: user-profile-service
+  minReplicas: 2
+  maxReplicas: 20
+  metrics:
+    - type: Resource
+      resource:
+        name: cpu
+        target:
+          type: Utilization
+          averageUtilization: 70

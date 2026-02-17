@@ -1,0 +1,15 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "careeros.subscription-activated.v1",
+  "type": "object",
+  "required": ["subscription_id", "user_id", "plan_code", "activated_at", "status"],
+  "properties": {
+    "subscription_id": { "type": "string", "format": "uuid" },
+    "user_id": { "type": "string", "format": "uuid" },
+    "organization_id": { "type": "string", "format": "uuid" },
+    "plan_code": { "type": "string" },
+    "activated_at": { "type": "string", "format": "date-time" },
+    "status": { "type": "string", "enum": ["ACTIVE", "TRIAL", "PAST_DUE"] }
+  },
+  "additionalProperties": false
+}

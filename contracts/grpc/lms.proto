@@ -1,0 +1,33 @@
+syntax = "proto3";
+
+package careeros.lms.v1;
+
+import "common.proto";
+
+service LMSService {
+  rpc GetCourse(GetCourseRequest) returns (GetCourseResponse);
+  rpc GetEnrollment(GetEnrollmentRequest) returns (GetEnrollmentResponse);
+}
+
+message GetCourseRequest {
+  careeros.common.v1.RequestMeta meta = 1;
+  string course_id = 2;
+}
+
+message GetCourseResponse {
+  string course_id = 1;
+  string title = 2;
+  string instructor_id = 3;
+  bool is_published = 4;
+}
+
+message GetEnrollmentRequest {
+  careeros.common.v1.RequestMeta meta = 1;
+  string user_id = 2;
+  string course_id = 3;
+}
+
+message GetEnrollmentResponse {
+  bool enrolled = 1;
+  string enrollment_status = 2;
+}

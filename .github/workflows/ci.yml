@@ -1,0 +1,36 @@
+name: CI
+
+on:
+  pull_request:
+    branches: ["main"]
+
+jobs:
+  contracts-and-migrations:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Validate protobuf contracts exist
+        run: test -f contracts/grpc/common.proto
+      - name: Validate event schemas exist
+        run: test -f contracts/events/event-envelope-v1.json
+      - name: Validate migrations exist
+        run: test -f database/auth/001_init.sql
+
+  build-images:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        service:
+          - api-gateway
+          - auth-service
+          - user-profile-service
+          - ai-core-service
+          - roadmap-service
+          - lms-service
+          - edu-tracker-service
+          - subscription-billing-service
+          - analytics-service
+    steps:
+      - uses: actions/checkout@v4
+      - name: Placeholder build step
+        run: echo "Build ${{ matrix.service }} image here"

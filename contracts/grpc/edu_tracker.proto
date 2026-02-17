@@ -1,0 +1,21 @@
+syntax = "proto3";
+
+package careeros.edutracker.v1;
+
+import "common.proto";
+
+service EduTrackerService {
+  rpc GetLearningProgress(GetLearningProgressRequest) returns (GetLearningProgressResponse);
+}
+
+message GetLearningProgressRequest {
+  careeros.common.v1.RequestMeta meta = 1;
+  string user_id = 2;
+}
+
+message GetLearningProgressResponse {
+  double mastery_score = 1;
+  int32 streak_days = 2;
+  int32 minutes_this_week = 3;
+  double productivity_score = 4;
+}

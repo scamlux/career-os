@@ -1,0 +1,26 @@
+syntax = "proto3";
+
+package careeros.roadmap.v1;
+
+import "common.proto";
+
+service RoadmapService {
+  rpc GetActiveRoadmap(GetActiveRoadmapRequest) returns (GetActiveRoadmapResponse);
+  rpc RecalculateTimeline(RecalculateTimelineRequest) returns (careeros.common.v1.Ack);
+}
+
+message GetActiveRoadmapRequest {
+  careeros.common.v1.RequestMeta meta = 1;
+  string user_id = 2;
+}
+
+message GetActiveRoadmapResponse {
+  string roadmap_id = 1;
+  int32 version = 2;
+  string status = 3;
+}
+
+message RecalculateTimelineRequest {
+  careeros.common.v1.RequestMeta meta = 1;
+  string roadmap_id = 2;
+}

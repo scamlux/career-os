@@ -1,0 +1,27 @@
+import * as Joi from 'joi';
+export declare const envSchema: Joi.ObjectSchema<any>;
+export type CommonEnv = {
+    NODE_ENV: 'development' | 'test' | 'production';
+    LOG_LEVEL: string;
+    HTTP_PORT: number;
+    GRPC_PORT: number;
+    DATABASE_URL: string;
+    KAFKA_BROKERS: string;
+    KAFKA_CLIENT_ID: string;
+    REDIS_URL?: string;
+    SERVICE_SHARED_SECRET: string;
+    THROTTLE_TTL: number;
+    THROTTLE_LIMIT: number;
+    JWT_ACCESS_SECRET: string;
+    JWT_REFRESH_SECRET: string;
+    JWT_ACCESS_EXPIRES_IN: string;
+    JWT_REFRESH_EXPIRES_IN: string;
+    AUTH_GRPC_URL: string;
+    USER_PROFILE_GRPC_URL: string;
+    AI_CORE_GRPC_URL: string;
+    ROADMAP_GRPC_URL: string;
+    LMS_GRPC_URL: string;
+    EDU_TRACKER_GRPC_URL: string;
+    BILLING_GRPC_URL: string;
+    ANALYTICS_GRPC_URL: string;
+};

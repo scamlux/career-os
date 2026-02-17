@@ -1,0 +1,13 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "careeros.roadmap-created.v1",
+  "type": "object",
+  "required": ["roadmap_id", "user_id", "goal_key", "version"],
+  "properties": {
+    "roadmap_id": { "type": "string", "format": "uuid" },
+    "user_id": { "type": "string", "format": "uuid" },
+    "goal_key": { "type": "string" },
+    "version": { "type": "integer", "minimum": 1 }
+  },
+  "additionalProperties": false
+}

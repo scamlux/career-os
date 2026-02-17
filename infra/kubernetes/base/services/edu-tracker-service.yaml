@@ -1,0 +1,66 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: edu-tracker-service
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: edu-tracker-service
+  template:
+    metadata:
+      labels:
+        app: edu-tracker-service
+    spec:
+      containers:
+        - name: edu-tracker-service
+          image: careeros/edu-tracker-service:latest
+          ports:
+            - containerPort: 8080
+            - containerPort: 50051
+          envFrom:
+            - configMapRef:
+                name: platform-config
+          env:
+            - name: SERVICE_NAME
+              value: edu-tracker-service
+            - name: GRPC_PORT
+              value: "50051"
+            - name: HTTP_PORT
+              value: "8080"
+            - name: DATABASE_URL
+              value: postgres://postgres:postgres@edu-tracker-db.careeros.svc.cluster.local:5432/edu_tracker
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: edu-tracker-service
+spec:
+  selector:
+    app: edu-tracker-service
+  ports:
+    - name: http
+      port: 8080
+      targetPort: 8080
+    - name: grpc
+      port: 50051
+      targetPort: 50051
+---
+apiVersion: autoscaling/v2
+kind: HorizontalPodAutoscaler
+metadata:
+  name: edu-tracker-service
+spec:
+  scaleTargetRef:
+    apiVersion: apps/v1
+    kind: Deployment
+    name: edu-tracker-service
+  minReplicas: 2
+  maxReplicas: 20
+  metrics:
+    - type: Resource
+      resource:
+        name: cpu
+        target:
+          type: Utilization
+          averageUtilization: 70

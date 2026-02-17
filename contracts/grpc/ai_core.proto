@@ -1,0 +1,36 @@
+syntax = "proto3";
+
+package careeros.aicore.v1;
+
+import "common.proto";
+
+service AICoreService {
+  rpc ExecuteFlow(ExecuteFlowRequest) returns (ExecuteFlowResponse);
+  rpc GetFlowUsage(GetFlowUsageRequest) returns (GetFlowUsageResponse);
+}
+
+message ExecuteFlowRequest {
+  careeros.common.v1.RequestMeta meta = 1;
+  string flow_name = 2;
+  string flow_version = 3;
+  string input_json = 4;
+}
+
+message ExecuteFlowResponse {
+  string execution_id = 1;
+  string status = 2;
+  string output_json = 3;
+  double confidence = 4;
+}
+
+message GetFlowUsageRequest {
+  careeros.common.v1.RequestMeta meta = 1;
+  string user_id = 2;
+}
+
+message GetFlowUsageResponse {
+  int64 requests_count = 1;
+  int64 prompt_tokens = 2;
+  int64 completion_tokens = 3;
+  double total_cost_usd = 4;
+}

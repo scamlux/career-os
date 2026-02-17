@@ -1,0 +1,36 @@
+syntax = "proto3";
+
+package careeros.userprofile.v1;
+
+import "common.proto";
+
+service UserProfileService {
+  rpc GetProfile(GetProfileRequest) returns (GetProfileResponse);
+  rpc GetUserSkillMatrix(GetUserSkillMatrixRequest) returns (GetUserSkillMatrixResponse);
+}
+
+message GetProfileRequest {
+  careeros.common.v1.RequestMeta meta = 1;
+  string user_id = 2;
+}
+
+message GetProfileResponse {
+  string user_id = 1;
+  string full_name = 2;
+  string title = 3;
+  string location = 4;
+}
+
+message GetUserSkillMatrixRequest {
+  careeros.common.v1.RequestMeta meta = 1;
+  string user_id = 2;
+}
+
+message SkillScore {
+  string skill_key = 1;
+  double score = 2;
+}
+
+message GetUserSkillMatrixResponse {
+  repeated SkillScore skills = 1;
+}

@@ -1,0 +1,15 @@
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+namespace: careeros
+resources:
+  - namespace.yaml
+  - platform-configmap.yaml
+  - api-gateway.yaml
+  - services/auth-service.yaml
+  - services/user-profile-service.yaml
+  - services/ai-core-service.yaml
+  - services/roadmap-service.yaml
+  - services/lms-service.yaml
+  - services/edu-tracker-service.yaml
+  - services/subscription-billing-service.yaml
+  - services/analytics-service.yaml

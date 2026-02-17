@@ -1,0 +1,66 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: ai-core-service
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: ai-core-service
+  template:
+    metadata:
+      labels:
+        app: ai-core-service
+    spec:
+      containers:
+        - name: ai-core-service
+          image: careeros/ai-core-service:latest
+          ports:
+            - containerPort: 8080
+            - containerPort: 50051
+          envFrom:
+            - configMapRef:
+                name: platform-config
+          env:
+            - name: SERVICE_NAME
+              value: ai-core-service
+            - name: GRPC_PORT
+              value: "50051"
+            - name: HTTP_PORT
+              value: "8080"
+            - name: DATABASE_URL
+              value: postgres://postgres:postgres@ai-core-db.careeros.svc.cluster.local:5432/ai_core
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: ai-core-service
+spec:
+  selector:
+    app: ai-core-service
+  ports:
+    - name: http
+      port: 8080
+      targetPort: 8080
+    - name: grpc
+      port: 50051
+      targetPort: 50051
+---
+apiVersion: autoscaling/v2
+kind: HorizontalPodAutoscaler
+metadata:
+  name: ai-core-service
+spec:
+  scaleTargetRef:
+    apiVersion: apps/v1
+    kind: Deployment
+    name: ai-core-service
+  minReplicas: 2
+  maxReplicas: 20
+  metrics:
+    - type: Resource
+      resource:
+        name: cpu
+        target:
+          type: Utilization
+          averageUtilization: 70

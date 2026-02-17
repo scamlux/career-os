@@ -1,0 +1,22 @@
+syntax = "proto3";
+
+package careeros.common.v1;
+
+message RequestMeta {
+  string request_id = 1;
+  string user_id = 2;
+  string tenant_id = 3;
+  string plan_tier = 4;
+}
+
+message Pagination {
+  int32 page = 1;
+  int32 page_size = 2;
+}
+
+message Empty {}
+
+message Ack {
+  bool ok = 1;
+  string message = 2;
+}

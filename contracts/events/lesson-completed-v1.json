@@ -1,0 +1,14 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "careeros.lesson-completed.v1",
+  "type": "object",
+  "required": ["lesson_id", "course_id", "user_id", "completed_at", "time_spent_minutes"],
+  "properties": {
+    "lesson_id": { "type": "string", "format": "uuid" },
+    "course_id": { "type": "string", "format": "uuid" },
+    "user_id": { "type": "string", "format": "uuid" },
+    "completed_at": { "type": "string", "format": "date-time" },
+    "time_spent_minutes": { "type": "integer", "minimum": 0 }
+  },
+  "additionalProperties": false
+}

@@ -1,0 +1,218 @@
+services:
+  zookeeper:
+    image: confluentinc/cp-zookeeper:7.5.0
+    environment:
+      ZOOKEEPER_CLIENT_PORT: 2181
+
+  kafka:
+    image: confluentinc/cp-kafka:7.5.0
+    depends_on: [zookeeper]
+    ports: ['9092:9092']
+    environment:
+      KAFKA_BROKER_ID: 1
+      KAFKA_ZOOKEEPER_CONNECT: zookeeper:2181
+      KAFKA_LISTENERS: PLAINTEXT://0.0.0.0:9092
+      KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://kafka:9092
+      KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
+
+  redis:
+    image: redis:7-alpine
+    ports: ['6379:6379']
+
+  auth-db:
+    image: postgres:16-alpine
+    environment: { POSTGRES_DB: auth, POSTGRES_USER: postgres, POSTGRES_PASSWORD: postgres }
+    ports: ['5433:5432']
+
+  user-profile-db:
+    image: postgres:16-alpine
+    environment: { POSTGRES_DB: user_profile, POSTGRES_USER: postgres, POSTGRES_PASSWORD: postgres }
+    ports: ['5434:5432']
+
+  ai-core-db:
+    image: postgres:16-alpine
+    environment: { POSTGRES_DB: ai_core, POSTGRES_USER: postgres, POSTGRES_PASSWORD: postgres }
+    ports: ['5435:5432']
+
+  roadmap-db:
+    image: postgres:16-alpine
+    environment: { POSTGRES_DB: roadmap, POSTGRES_USER: postgres, POSTGRES_PASSWORD: postgres }
+    ports: ['5436:5432']
+
+  lms-db:
+    image: postgres:16-alpine
+    environment: { POSTGRES_DB: lms, POSTGRES_USER: postgres, POSTGRES_PASSWORD: postgres }
+    ports: ['5437:5432']
+
+  edu-tracker-db:
+    image: postgres:16-alpine
+    environment: { POSTGRES_DB: edu_tracker, POSTGRES_USER: postgres, POSTGRES_PASSWORD: postgres }
+    ports: ['5438:5432']
+
+  billing-db:
+    image: postgres:16-alpine
+    environment: { POSTGRES_DB: billing, POSTGRES_USER: postgres, POSTGRES_PASSWORD: postgres }
+    ports: ['5439:5432']
+
+  analytics-db:
+    image: postgres:16-alpine
+    environment: { POSTGRES_DB: analytics, POSTGRES_USER: postgres, POSTGRES_PASSWORD: postgres }
+    ports: ['5440:5432']
+
+  auth-service:
+    build:
+      context: ../..
+      dockerfile: services/auth-service/Dockerfile
+    depends_on: [auth-db, kafka]
+    ports: ['8081:8080', '6001:6001']
+    environment:
+      HTTP_PORT: 8080
+      GRPC_PORT: 6001
+      DATABASE_URL: postgres://postgres:postgres@auth-db:5432/auth
+      KAFKA_BROKERS: kafka:9092
+      KAFKA_CLIENT_ID: careeros-auth
+      SERVICE_SHARED_SECRET: change-me
+      JWT_ACCESS_SECRET: dev-access-secret-change-me
+      JWT_REFRESH_SECRET: dev-refresh-secret-change-me
+
+  user-profile-service:
+    build:
+      context: ../..
+      dockerfile: services/user-profile-service/Dockerfile
+    depends_on: [user-profile-db, kafka]
+    ports: ['8082:8080', '6002:6002']
+    environment:
+      HTTP_PORT: 8080
+      GRPC_PORT: 6002
+      DATABASE_URL: postgres://postgres:postgres@user-profile-db:5432/user_profile
+      KAFKA_BROKERS: kafka:9092
+      KAFKA_CLIENT_ID: careeros-user-profile
+      SERVICE_SHARED_SECRET: change-me
+
+  ai-core-service:
+    build:
+      context: ../..
+      dockerfile: services/ai-core-service/Dockerfile
+    depends_on: [ai-core-db, kafka]
+    ports: ['8083:8080', '6003:6003']
+    environment:
+      HTTP_PORT: 8080
+      GRPC_PORT: 6003
+      DATABASE_URL: postgres://postgres:postgres@ai-core-db:5432/ai_core
+      KAFKA_BROKERS: kafka:9092
+      KAFKA_CLIENT_ID: careeros-ai-core
+      SERVICE_SHARED_SECRET: change-me
+
+  roadmap-service:
+    build:
+      context: ../..
+      dockerfile: services/roadmap-service/Dockerfile
+    depends_on: [roadmap-db, kafka]
+    ports: ['8084:8080', '6004:6004']
+    environment:
+      HTTP_PORT: 8080
+      GRPC_PORT: 6004
+      DATABASE_URL: postgres://postgres:postgres@roadmap-db:5432/roadmap
+      KAFKA_BROKERS: kafka:9092
+      KAFKA_CLIENT_ID: careeros-roadmap
+      SERVICE_SHARED_SECRET: change-me
+
+  lms-service:
+    build:
+      context: ../..
+      dockerfile: services/lms-service/Dockerfile
+    depends_on: [lms-db, kafka]
+    ports: ['8085:8080', '6005:6005']
+    environment:
+      HTTP_PORT: 8080
+      GRPC_PORT: 6005
+      DATABASE_URL: postgres://postgres:postgres@lms-db:5432/lms
+      KAFKA_BROKERS: kafka:9092
+      KAFKA_CLIENT_ID: careeros-lms
+      SERVICE_SHARED_SECRET: change-me
+
+  edu-tracker-service:
+    build:
+      context: ../..
+      dockerfile: services/edu-tracker-service/Dockerfile
+    depends_on: [edu-tracker-db, kafka]
+    ports: ['8086:8080', '6006:6006']
+    environment:
+      HTTP_PORT: 8080
+      GRPC_PORT: 6006
+      DATABASE_URL: postgres://postgres:postgres@edu-tracker-db:5432/edu_tracker
+      KAFKA_BROKERS: kafka:9092
+      KAFKA_CLIENT_ID: careeros-edu-tracker
+      SERVICE_SHARED_SECRET: change-me
+
+  subscription-billing-service:
+    build:
+      context: ../..
+      dockerfile: services/subscription-billing-service/Dockerfile
+    depends_on: [billing-db, kafka]
+    ports: ['8087:8080', '6007:6007']
+    environment:
+      HTTP_PORT: 8080
+      GRPC_PORT: 6007
+      DATABASE_URL: postgres://postgres:postgres@billing-db:5432/billing
+      KAFKA_BROKERS: kafka:9092
+      KAFKA_CLIENT_ID: careeros-billing
+      SERVICE_SHARED_SECRET: change-me
+
+  analytics-service:
+    build:
+      context: ../..
+      dockerfile: services/analytics-service/Dockerfile
+    depends_on: [analytics-db, kafka]
+    ports: ['8088:8080', '6008:6008']
+    environment:
+      HTTP_PORT: 8080
+      GRPC_PORT: 6008
+      DATABASE_URL: postgres://postgres:postgres@analytics-db:5432/analytics
+      KAFKA_BROKERS: kafka:9092
+      KAFKA_CLIENT_ID: careeros-analytics
+      SERVICE_SHARED_SECRET: change-me
+
+  api-gateway:
+    build:
+      context: ../..
+      dockerfile: services/api-gateway/Dockerfile
+    depends_on:
+      - auth-service
+      - user-profile-service
+      - ai-core-service
+      - roadmap-service
+      - lms-service
+      - edu-tracker-service
+      - subscription-billing-service
+      - analytics-service
+    environment:
+      HTTP_PORT: 8080
+      DATABASE_URL: postgres://postgres:postgres@auth-db:5432/auth
+      KAFKA_BROKERS: kafka:9092
+      KAFKA_CLIENT_ID: careeros-gateway
+      SERVICE_SHARED_SECRET: change-me
+      AUTH_GRPC_URL: auth-service:6001
+      USER_PROFILE_GRPC_URL: user-profile-service:6002
+      AI_CORE_GRPC_URL: ai-core-service:6003
+      ROADMAP_GRPC_URL: roadmap-service:6004
+      LMS_GRPC_URL: lms-service:6005
+      EDU_TRACKER_GRPC_URL: edu-tracker-service:6006
+      BILLING_GRPC_URL: subscription-billing-service:6007
+      ANALYTICS_GRPC_URL: analytics-service:6008
+    ports: ['8080:8080']
+
+  prometheus:
+    image: prom/prometheus:v2.51.0
+    ports: ['9090:9090']
+
+  grafana:
+    image: grafana/grafana:10.4.2
+    ports: ['3000:3000']
+
+  elasticsearch:
+    image: docker.elastic.co/elasticsearch/elasticsearch:8.13.0
+    environment:
+      - discovery.type=single-node
+      - xpack.security.enabled=false
+    ports: ['9200:9200']

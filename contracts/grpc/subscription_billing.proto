@@ -1,0 +1,32 @@
+syntax = "proto3";
+
+package careeros.billing.v1;
+
+import "common.proto";
+
+service SubscriptionBillingService {
+  rpc CheckEntitlement(CheckEntitlementRequest) returns (CheckEntitlementResponse);
+  rpc GetActiveSubscription(GetActiveSubscriptionRequest) returns (GetActiveSubscriptionResponse);
+}
+
+message CheckEntitlementRequest {
+  careeros.common.v1.RequestMeta meta = 1;
+  string user_id = 2;
+  string feature_key = 3;
+}
+
+message CheckEntitlementResponse {
+  bool allowed = 1;
+  string reason = 2;
+}
+
+message GetActiveSubscriptionRequest {
+  careeros.common.v1.RequestMeta meta = 1;
+  string user_id = 2;
+}
+
+message GetActiveSubscriptionResponse {
+  string plan_code = 1;
+  string status = 2;
+  string renew_at = 3;
+}

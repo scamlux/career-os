@@ -1,0 +1,31 @@
+syntax = "proto3";
+
+package careeros.auth.v1;
+
+import "common.proto";
+
+service AuthService {
+  rpc ValidateAccessToken(ValidateAccessTokenRequest) returns (ValidateAccessTokenResponse);
+  rpc GetUserPermissions(GetUserPermissionsRequest) returns (GetUserPermissionsResponse);
+}
+
+message ValidateAccessTokenRequest {
+  careeros.common.v1.RequestMeta meta = 1;
+  string access_token = 2;
+}
+
+message ValidateAccessTokenResponse {
+  bool valid = 1;
+  string user_id = 2;
+  string tenant_id = 3;
+  repeated string roles = 4;
+}
+
+message GetUserPermissionsRequest {
+  careeros.common.v1.RequestMeta meta = 1;
+  string user_id = 2;
+}
+
+message GetUserPermissionsResponse {
+  repeated string permissions = 1;
+}

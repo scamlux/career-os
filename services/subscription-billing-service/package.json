@@ -1,0 +1,9 @@
+{
+  "name": "@careeros/subscription-billing-service",
+  "version": "0.1.0",
+  "private": true,
+  "scripts": {
+    "dev": "tsx watch src/main.ts",
+    "build": "tsc -p tsconfig.json"
+  }
+}
