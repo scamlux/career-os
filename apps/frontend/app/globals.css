@@ -1,0 +1,46 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --bg: 222 23% 8%;
+  --panel: 224 18% 12%;
+  --muted: 220 10% 64%;
+  --line: 223 16% 21%;
+  --text: 213 26% 95%;
+  --accent: 205 84% 54%;
+  --success: 146 56% 45%;
+  --danger: 352 75% 57%;
+  --warning: 35 89% 58%;
+}
+
+* {
+  border-color: hsl(var(--line));
+}
+
+html,
+body {
+  margin: 0;
+  min-height: 100%;
+  background: hsl(var(--bg));
+  color: hsl(var(--text));
+}
+
+body {
+  font-family: var(--font-sans), ui-sans-serif, system-ui;
+}
+
+a {
+  color: inherit;
+  text-decoration: none;
+}
+
+@layer components {
+  .panel {
+    @apply rounded-xl border border-line bg-panel p-4;
+  }
+
+  .grid-cards {
+    @apply grid gap-4 md:grid-cols-2 xl:grid-cols-3;
+  }
+}

@@ -1,0 +1,37 @@
+{
+  "name": "@careeros/frontend",
+  "private": true,
+  "version": "0.2.0",
+  "scripts": {
+    "dev": "next dev --port 3001",
+    "build": "next build",
+    "preview": "next start --port 3001",
+    "start": "next start --port 3001",
+    "lint": "next lint",
+    "typecheck": "tsc --noEmit"
+  },
+  "dependencies": {
+    "@headlessui/react": "^2.2.0",
+    "@tanstack/react-query": "^5.66.8",
+    "clsx": "^2.1.1",
+    "framer-motion": "^12.4.7",
+    "lucide-react": "^0.475.0",
+    "next": "^15.1.6",
+    "react": "^19.0.0",
+    "react-dom": "^19.0.0",
+    "recharts": "^2.15.1",
+    "tailwind-merge": "^3.0.2",
+    "zustand": "^5.0.3"
+  },
+  "devDependencies": {
+    "@types/node": "^22.10.7",
+    "@types/react": "^19.0.8",
+    "@types/react-dom": "^19.0.3",
+    "autoprefixer": "^10.4.20",
+    "eslint": "^9.19.0",
+    "eslint-config-next": "^15.1.6",
+    "postcss": "^8.5.1",
+    "tailwindcss": "^3.4.17",
+    "typescript": "^5.7.3"
+  }
+}

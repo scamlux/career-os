@@ -3,11 +3,12 @@
   "version": "0.1.0",
   "private": true,
   "workspaces": [
+    "apps/*",
     "packages/*",
     "services/*"
   ],
   "scripts": {
-    "build": "npm run build:shared && npm run build:services",
+    "build": "npm run build:shared && npm run build:services && npm run build:frontend",
     "build:shared": "tsc -p packages/shared/tsconfig.json",
     "build:services": "npm run build:api-gateway && npm run build:auth && npm run build:user-profile && npm run build:ai-core && npm run build:roadmap && npm run build:lms && npm run build:edu-tracker && npm run build:billing && npm run build:analytics",
     "build:api-gateway": "tsc -p services/api-gateway/tsconfig.json",
@@ -19,6 +20,7 @@
     "build:edu-tracker": "tsc -p services/edu-tracker-service/tsconfig.json",
     "build:billing": "tsc -p services/subscription-billing-service/tsconfig.json",
     "build:analytics": "tsc -p services/analytics-service/tsconfig.json",
+    "build:frontend": "npm --workspace @careeros/frontend run build",
     "infra:up": "docker compose -f infra/docker/docker-compose.local.yml up -d",
     "infra:down": "docker compose -f infra/docker/docker-compose.local.yml down",
     "migrate:local": "node scripts/apply-migrations.mjs",
@@ -31,6 +33,8 @@
     "dev:edu-tracker": "tsx watch services/edu-tracker-service/src/main.ts",
     "dev:billing": "tsx watch services/subscription-billing-service/src/main.ts",
     "dev:analytics": "tsx watch services/analytics-service/src/main.ts",
+    "dev:frontend": "npm --workspace @careeros/frontend run dev",
+    "preview:frontend": "npm --workspace @careeros/frontend run preview",
     "typecheck": "npm run build"
   },
   "dependencies": {

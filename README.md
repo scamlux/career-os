@@ -25,6 +25,7 @@ Primary architecture docs:
 - `/Users/muhammadumar/Desktop/career-os/docs/03-ai-orchestration.md`
 
 ## Services
+- `apps/frontend` (Next.js App Router frontend with RBAC, feature gating, AI streaming, and canvas roadmap engine)
 - `services/api-gateway`
 - `services/auth-service`
 - `services/user-profile-service`
@@ -54,6 +55,21 @@ docker compose -f infra/docker/docker-compose.local.yml up --build -d
 ```
 4. API Gateway endpoint:
 - `http://localhost:8080/v1/health`
+
+## Frontend (AI-Native Web App)
+1. Install dependencies:
+```bash
+npm install
+```
+2. Run frontend:
+```bash
+npm run dev:frontend
+```
+3. Open:
+- `http://localhost:3001`
+
+Frontend proxy routes are preconfigured to local services (`8080-8088`) through Next rewrites, so no CORS configuration is required for local development.
+If needed, override endpoints via `/Users/muhammadumar/Desktop/career-os/apps/frontend/.env.example`.
 
 ## Run Services Manually (without containerized app layer)
 - Start infra only from compose (Kafka/Postgres/Redis).
