@@ -5,10 +5,9 @@ import { Accordion } from '@/shared/components/ui/accordion';
 import { AIMessageBlock } from '@/shared/components/ui/ai-message-block';
 import { Button } from '@/shared/components/ui/button';
 import { FeatureGate } from '@/shared/components/navigation/feature-gate';
-import { Input, Textarea } from '@/shared/components/ui/input';
+import { Textarea } from '@/shared/components/ui/input';
 import { PageShell } from '@/shared/components/ui/page-shell';
 import { apiRequest } from '@/shared/api/http-client';
-import { useAIStream } from '@/shared/ws/use-ai-stream';
 import { useAppStore } from '@/shared/store/app-store';
 
 type Mode = 'chat' | 'resume' | 'interview';
@@ -35,12 +34,6 @@ export function AIAssistantView() {
     setAiCredits: state.setAiCredits
   }));
 
-  const stream = useAIStream({
-    onToken: (token) => {
-      setResponse((prev) => prev + token);
-    }
-  });
-
   const structuredBlocks = useMemo(
     () => [
       { title: 'Summary', content: response ? response.slice(0, 220) : 'Waiting for AI output' },
@@ -65,38 +58,65 @@ export function AIAssistantView() {
     }
 
     setResponse('');
-    stream.setStreaming(true);
 
     try {
-      await stream.streamPrompt(finalPrompt);
-      const execution = await apiRequest<Record<string, unknown>>('gateway', '/v1/ai/flows/execute', {
-        method: 'POST',
-        body: {
-          userId,
-          tenantId,
-          flowName: mode === 'resume' ? 'resume_analysis' : mode === 'interview' ? 'interview_simulation' : 'skill_gap_analysis',
-          flowVersion: 'v1',
-          input: {
-            prompt: finalPrompt,
-            cv: cvText
+      if (mode === 'chat') {
+        const chat = await apiRequest<{ message: string; blocked?: boolean; reason?: string }>('gateway', '/v1/ai/chat', {
+          method: 'POST',
+          body: {
+            userId,
+            tenantId,
+            mode: 'career_advice',
+            messages: [{ role: 'user', content: finalPrompt }]
           }
-        }
-      });
+        });
 
-      setHistory((prev) => [
-        {
-          id: crypto.randomUUID(),
-          mode,
-          prompt: finalPrompt,
-          response: response || JSON.stringify(execution)
-        },
-        ...prev
-      ]);
+        if (chat.blocked) {
+          setError(chat.reason ?? 'Feature is locked');
+          return;
+        }
+
+        setResponse(chat.message);
+        setHistory((prev) => [
+          {
+            id: crypto.randomUUID(),
+            mode,
+            prompt: finalPrompt,
+            response: chat.message
+          },
+          ...prev
+        ]);
+      } else {
+        const execution = await apiRequest<Record<string, unknown>>('gateway', '/v1/ai/flows/execute', {
+          method: 'POST',
+          body: {
+            userId,
+            tenantId,
+            flowName: mode === 'resume' ? 'resume_analysis' : 'interview_simulation',
+            flowVersion: 'v1',
+            input: {
+              prompt: finalPrompt,
+              cv: cvText
+            }
+          }
+        });
+
+        const executionText = JSON.stringify(execution, null, 2);
+        setResponse(executionText);
+        setHistory((prev) => [
+          {
+            id: crypto.randomUUID(),
+            mode,
+            prompt: finalPrompt,
+            response: executionText
+          },
+          ...prev
+        ]);
+      }
+
       setAiCredits(Math.max(0, aiCredits - 1));
     } catch (reason) {
       setError(reason instanceof Error ? reason.message : 'AI timeout');
-    } finally {
-      stream.setStreaming(false);
     }
   };
 
@@ -159,8 +179,8 @@ export function AIAssistantView() {
             ) : null}
             {error ? <p className="rounded-md border border-danger/40 bg-danger/10 p-2 text-sm text-danger">{error}</p> : null}
             <div className="flex flex-wrap gap-2">
-              <Button onClick={runAI} disabled={stream.streaming}>
-                {stream.streaming ? 'AI thinking...' : 'Send'}
+              <Button onClick={runAI}>
+                Send
               </Button>
               <Button variant="ghost" onClick={saveAsRoadmap}>
                 Save as roadmap

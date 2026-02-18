@@ -7,6 +7,10 @@ import "common.proto";
 service RoadmapService {
   rpc GetActiveRoadmap(GetActiveRoadmapRequest) returns (GetActiveRoadmapResponse);
   rpc RecalculateTimeline(RecalculateTimelineRequest) returns (careeros.common.v1.Ack);
+  rpc InterviewTurn(RoadmapInterviewTurnRequest) returns (RoadmapInterviewTurnResponse);
+  rpc CreateDraft(CreateRoadmapDraftRequest) returns (RoadmapDraftResponse);
+  rpc UpdateDraftCanvas(UpdateRoadmapDraftCanvasRequest) returns (RoadmapDraftResponse);
+  rpc ListDrafts(ListRoadmapDraftsRequest) returns (ListRoadmapDraftsResponse);
 }
 
 message GetActiveRoadmapRequest {
@@ -23,4 +27,69 @@ message GetActiveRoadmapResponse {
 message RecalculateTimelineRequest {
   careeros.common.v1.RequestMeta meta = 1;
   string roadmap_id = 2;
+}
+
+message RoadmapInterviewMessage {
+  string question = 1;
+  string answer = 2;
+}
+
+message RoadmapInterviewTurnRequest {
+  careeros.common.v1.RequestMeta meta = 1;
+  string user_id = 2;
+  string tenant_id = 3;
+  string draft_id = 4;
+  repeated RoadmapInterviewMessage messages = 5;
+}
+
+message RoadmapInterviewTurnResponse {
+  string draft_id = 1;
+  string next_question = 2;
+  string status = 3;
+  string summary = 4;
+  string ai_execution_id = 5;
+}
+
+message CreateRoadmapDraftRequest {
+  careeros.common.v1.RequestMeta meta = 1;
+  string user_id = 2;
+  string tenant_id = 3;
+  string title = 4;
+  string target_role = 5;
+  string target_grade = 6;
+  string interview_log_json = 7;
+  string roadmap_nodes_json = 8;
+  string canvas_viewport_json = 9;
+}
+
+message UpdateRoadmapDraftCanvasRequest {
+  careeros.common.v1.RequestMeta meta = 1;
+  string draft_id = 2;
+  string user_id = 3;
+  string canvas_viewport_json = 4;
+  string roadmap_nodes_json = 5;
+}
+
+message RoadmapDraftResponse {
+  string id = 1;
+  string user_id = 2;
+  string tenant_id = 3;
+  string title = 4;
+  string target_role = 5;
+  string target_grade = 6;
+  string status = 7;
+  string interview_log_json = 8;
+  string roadmap_nodes_json = 9;
+  string canvas_viewport_json = 10;
+  string created_at = 11;
+  string updated_at = 12;
+}
+
+message ListRoadmapDraftsRequest {
+  careeros.common.v1.RequestMeta meta = 1;
+  string user_id = 2;
+}
+
+message ListRoadmapDraftsResponse {
+  repeated RoadmapDraftResponse items = 1;
 }

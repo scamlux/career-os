@@ -1,4 +1,5 @@
-import { BadRequestException, Injectable } from '@nestjs/common';
+import { BadRequestException, Injectable, ServiceUnavailableException } from '@nestjs/common';
+import { ConfigService } from '@nestjs/config';
 import { EventEnvelope, KafkaProducerService, PostgresService } from '@careeros/shared';
 import { v4 as uuidv4 } from 'uuid';
 
@@ -53,8 +54,86 @@ export class AICoreDomainService {
 
   constructor(
     private readonly postgres: PostgresService,
-    private readonly kafka: KafkaProducerService
+    private readonly kafka: KafkaProducerService,
+    private readonly configService: ConfigService
   ) {}
+
+  async chatMentor(input: {
+    userId: string;
+    tenantId: string;
+    mode: string;
+    messages: Array<{ role: string; content: string }>;
+  }): Promise<{ message: string; model: string; prompt_tokens: number; completion_tokens: number }> {
+    if (!input.messages.length) {
+      throw new BadRequestException('Chat messages are required');
+    }
+
+    const apiKey = this.configService.get<string>('OPENAI_API_KEY');
+    if (!apiKey) {
+      throw new ServiceUnavailableException('OPENAI_API_KEY is not configured in ai-core-service');
+    }
+
+    const model = this.configService.get<string>('OPENAI_MODEL') ?? 'gpt-4o-mini';
+    const systemPrompt =
+      'You are CareerOS AI mentor. Give concise, practical career guidance, ask clarifying questions, and produce actionable next steps.';
+
+    const response = await fetch('https://api.openai.com/v1/chat/completions', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: `Bearer ${apiKey}`
+      },
+      body: JSON.stringify({
+        model,
+        temperature: 0.6,
+        messages: [
+          {
+            role: 'system',
+            content: `${systemPrompt} Current mode: ${input.mode}.`
+          },
+          ...input.messages.map((item) => ({
+            role: item.role === 'assistant' ? 'assistant' : 'user',
+            content: item.content
+          }))
+        ]
+      })
+    });
+
+    if (!response.ok) {
+      const text = await response.text();
+      throw new ServiceUnavailableException(`OpenAI request failed: ${text}`);
+    }
+
+    const data = (await response.json()) as {
+      choices?: Array<{ message?: { content?: string } }>;
+      usage?: { prompt_tokens?: number; completion_tokens?: number };
+    };
+
+    const message = data.choices?.[0]?.message?.content?.trim();
+    if (!message) {
+      throw new ServiceUnavailableException('OpenAI returned empty answer');
+    }
+
+    await this.kafka.publish(
+      'careeros.ai.ai-flow-executed.v1',
+      this.buildEnvelope('AIFlowExecuted', input.tenantId, input.userId, {
+        execution_id: uuidv4(),
+        flow_name: 'chat_mentor',
+        flow_version: 'v1',
+        status: 'SUCCESS',
+        prompt_tokens: data.usage?.prompt_tokens ?? 0,
+        completion_tokens: data.usage?.completion_tokens ?? 0,
+        total_cost_usd: 0
+      })
+    );
+
+    return {
+      message,
+      model,
+      prompt_tokens: data.usage?.prompt_tokens ?? 0,
+      completion_tokens: data.usage?.completion_tokens ?? 0
+    };
+  }
 
   async executeFlow(input: {
     flowName: string;

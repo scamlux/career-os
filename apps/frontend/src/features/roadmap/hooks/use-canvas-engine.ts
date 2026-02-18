@@ -1,6 +1,6 @@
 'use client';
 
-import { useCallback, useMemo, useRef, useState } from 'react';
+import { useCallback, useMemo, useRef, useState, type PointerEvent, type WheelEvent } from 'react';
 
 export type CanvasNode = {
   id: string;
@@ -53,7 +53,7 @@ export function useCanvasEngine(initialNodes: CanvasNode[]) {
   }, []);
 
   const onPointerMove = useCallback(
-    (event: React.PointerEvent) => {
+    (event: PointerEvent) => {
       if (draggingRef.current) {
         const { nodeId, lastX, lastY } = draggingRef.current;
         const dx = (event.clientX - lastX) / scale;
@@ -76,13 +76,13 @@ export function useCanvasEngine(initialNodes: CanvasNode[]) {
     panningRef.current = null;
   }, []);
 
-  const onCanvasPointerDown = useCallback((event: React.PointerEvent) => {
+  const onCanvasPointerDown = useCallback((event: PointerEvent) => {
     if (event.button === 1 || event.shiftKey) {
       panningRef.current = { x: event.clientX, y: event.clientY };
     }
   }, []);
 
-  const onWheel = useCallback((event: React.WheelEvent) => {
+  const onWheel = useCallback((event: WheelEvent) => {
     event.preventDefault();
     const next = Math.min(2.2, Math.max(0.5, scale - event.deltaY * 0.001));
     setScale(next);

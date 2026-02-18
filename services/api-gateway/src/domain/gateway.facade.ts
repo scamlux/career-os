@@ -12,10 +12,39 @@ type UserProfileGrpc = {
 
 type AICoreGrpc = {
   ExecuteFlow(req: { meta: { user_id: string; tenant_id: string }; flow_name: string; flow_version?: string; input_json: string }): Observable<Record<string, unknown>>;
+  ChatMentor(req: {
+    user_id: string;
+    tenant_id: string;
+    mode: string;
+    messages: Array<{ role: string; content: string }>;
+  }): Observable<{ message: string; model: string; prompt_tokens: number; completion_tokens: number }>;
 };
 
 type RoadmapGrpc = {
   GetActiveRoadmap(req: { user_id: string }): Observable<Record<string, unknown>>;
+  InterviewTurn(req: {
+    user_id: string;
+    tenant_id: string;
+    draft_id?: string;
+    messages: Array<{ question: string; answer: string }>;
+  }): Observable<Record<string, unknown>>;
+  CreateDraft(req: {
+    user_id: string;
+    tenant_id: string;
+    title?: string;
+    target_role?: string;
+    target_grade?: string;
+    interview_log_json?: string;
+    roadmap_nodes_json?: string;
+    canvas_viewport_json?: string;
+  }): Observable<Record<string, unknown>>;
+  UpdateDraftCanvas(req: {
+    draft_id: string;
+    user_id: string;
+    canvas_viewport_json: string;
+    roadmap_nodes_json?: string;
+  }): Observable<Record<string, unknown>>;
+  ListDrafts(req: { user_id: string }): Observable<{ items: Record<string, unknown>[] }>;
 };
 
 type LmsGrpc = {
@@ -110,8 +139,98 @@ export class GatewayFacade implements OnModuleInit {
     );
   }
 
+  async chatMentor(input: {
+    userId: string;
+    tenantId: string;
+    mode: string;
+    messages: Array<{ role: string; content: string }>;
+  }) {
+    const entitlement = await firstValueFrom(
+      this.billingService.CheckEntitlement({
+        user_id: input.userId,
+        feature_key: 'ai.flow.execute'
+      })
+    );
+
+    if (!entitlement.allowed) {
+      return {
+        blocked: true,
+        reason: entitlement.reason
+      };
+    }
+
+    return firstValueFrom(
+      this.aiService.ChatMentor({
+        user_id: input.userId,
+        tenant_id: input.tenantId,
+        mode: input.mode,
+        messages: input.messages
+      })
+    );
+  }
+
   async getActiveRoadmap(userId: string) {
     return firstValueFrom(this.roadmapService.GetActiveRoadmap({ user_id: userId }));
+  }
+
+  async roadmapInterviewTurn(input: {
+    userId: string;
+    tenantId: string;
+    draftId?: string;
+    messages: Array<{ question: string; answer: string }>;
+  }) {
+    return firstValueFrom(
+      this.roadmapService.InterviewTurn({
+        user_id: input.userId,
+        tenant_id: input.tenantId,
+        draft_id: input.draftId,
+        messages: input.messages
+      })
+    );
+  }
+
+  async createRoadmapDraft(input: {
+    userId: string;
+    tenantId: string;
+    title?: string;
+    targetRole?: string;
+    targetGrade?: string;
+    interviewLog?: unknown[];
+    roadmapNodes?: unknown[];
+    canvasViewport?: Record<string, number>;
+  }) {
+    return firstValueFrom(
+      this.roadmapService.CreateDraft({
+        user_id: input.userId,
+        tenant_id: input.tenantId,
+        title: input.title,
+        target_role: input.targetRole,
+        target_grade: input.targetGrade,
+        interview_log_json: JSON.stringify(input.interviewLog ?? []),
+        roadmap_nodes_json: JSON.stringify(input.roadmapNodes ?? []),
+        canvas_viewport_json: JSON.stringify(input.canvasViewport ?? { x: 0, y: 0, scale: 1 })
+      })
+    );
+  }
+
+  async updateRoadmapDraftCanvas(input: {
+    draftId: string;
+    userId: string;
+    canvasViewport: Record<string, number>;
+    roadmapNodes?: unknown[];
+  }) {
+    return firstValueFrom(
+      this.roadmapService.UpdateDraftCanvas({
+        draft_id: input.draftId,
+        user_id: input.userId,
+        canvas_viewport_json: JSON.stringify(input.canvasViewport),
+        roadmap_nodes_json: input.roadmapNodes ? JSON.stringify(input.roadmapNodes) : undefined
+      })
+    );
+  }
+
+  async listRoadmapDrafts(userId: string) {
+    return firstValueFrom(this.roadmapService.ListDrafts({ user_id: userId }));
   }
 
   async getCourse(courseId: string) {

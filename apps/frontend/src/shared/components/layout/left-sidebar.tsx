@@ -1,6 +1,7 @@
 'use client';
 
 import Link from 'next/link';
+import type { Route } from 'next';
 import { usePathname } from 'next/navigation';
 import { mainNav, instructorNav, adminNav, orgNav } from '@/shared/navigation/routes';
 import { useAppStore } from '@/shared/store/app-store';
@@ -40,7 +41,7 @@ export function LeftSidebar() {
                 return (
                   <Link
                     key={item.href}
-                    href={item.href}
+                    href={item.href as Route}
                     className={cn(
                       'block rounded-lg px-3 py-2 text-sm transition',
                       active ? 'bg-accent/90 text-white' : 'text-muted hover:bg-bg hover:text-text'

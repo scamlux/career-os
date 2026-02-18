@@ -71,6 +71,14 @@ npm run dev:frontend
 Frontend proxy routes are preconfigured to local services (`8080-8088`) through Next rewrites, so no CORS configuration is required for local development.
 If needed, override endpoints via `/Users/muhammadumar/Desktop/career-os/apps/frontend/.env.example`.
 
+### Service Mode Switching UX
+- Floating top-center mode switcher: `AI-HR / Roadmap / Courses`
+- Mode switching does not reload the page and preserves mode state:
+  - AI sessions/history
+  - Roadmap canvas context and discovery answers
+  - Active/enrolled courses and tracking progress
+- Always-on AI helper button is available in all modes.
+
 ## Run Services Manually (without containerized app layer)
 - Start infra only from compose (Kafka/Postgres/Redis).
 - Run one service:

@@ -101,6 +101,8 @@ services:
       DATABASE_URL: postgres://postgres:postgres@ai-core-db:5432/ai_core
       KAFKA_BROKERS: kafka:9092
       KAFKA_CLIENT_ID: careeros-ai-core
+      OPENAI_API_KEY: ${OPENAI_API_KEY:-}
+      OPENAI_MODEL: ${OPENAI_MODEL:-gpt-4o-mini}
       SERVICE_SHARED_SECRET: change-me
 
   roadmap-service:
@@ -115,6 +117,7 @@ services:
       DATABASE_URL: postgres://postgres:postgres@roadmap-db:5432/roadmap
       KAFKA_BROKERS: kafka:9092
       KAFKA_CLIENT_ID: careeros-roadmap
+      AI_CORE_GRPC_URL: ai-core-service:6003
       SERVICE_SHARED_SECRET: change-me
 
   lms-service:

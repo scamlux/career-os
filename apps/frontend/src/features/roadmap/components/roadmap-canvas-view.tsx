@@ -1,6 +1,6 @@
 'use client';
 
-import { useMemo } from 'react';
+import { useMemo, type PointerEvent } from 'react';
 import { motion } from 'framer-motion';
 import { FeatureGate } from '@/shared/components/navigation/feature-gate';
 import { Button } from '@/shared/components/ui/button';
@@ -137,7 +137,10 @@ export function RoadmapCanvasView() {
                   x={node.x}
                   y={node.y}
                   selected={selectedNode?.id === node.id}
-                  onPointerDown={startNodeDrag}
+                  onPointerDown={(nodeId: string, event: PointerEvent<HTMLButtonElement>) =>
+                    startNodeDrag(nodeId, event.clientX, event.clientY)
+                  }
+                  onPointerUp={stopPointerAction}
                   onClick={setSelectedNodeId}
                 />
               ))}

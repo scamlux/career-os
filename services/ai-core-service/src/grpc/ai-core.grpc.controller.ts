@@ -16,6 +16,13 @@ type GetFlowUsageRequest = {
   user_id: string;
 };
 
+type ChatMentorRequest = {
+  user_id: string;
+  tenant_id: string;
+  mode: string;
+  messages: Array<{ role: string; content: string }>;
+};
+
 @Controller()
 export class AICoreGrpcController {
   constructor(private readonly aiDomainService: AICoreDomainService) {}
@@ -42,6 +49,16 @@ export class AICoreGrpcController {
   @GrpcMethod('AICoreService', 'GetFlowUsage')
   async getFlowUsage(payload: GetFlowUsageRequest) {
     return this.aiDomainService.getFlowUsage(payload.user_id);
+  }
+
+  @GrpcMethod('AICoreService', 'ChatMentor')
+  async chatMentor(payload: ChatMentorRequest) {
+    return this.aiDomainService.chatMentor({
+      userId: payload.user_id,
+      tenantId: payload.tenant_id,
+      mode: payload.mode,
+      messages: payload.messages ?? []
+    });
   }
 
   private safeJsonParse(input: string): Record<string, unknown> {

@@ -23,7 +23,9 @@ export const envSchema = Joi.object({
   LMS_GRPC_URL: Joi.string().default('localhost:6005'),
   EDU_TRACKER_GRPC_URL: Joi.string().default('localhost:6006'),
   BILLING_GRPC_URL: Joi.string().default('localhost:6007'),
-  ANALYTICS_GRPC_URL: Joi.string().default('localhost:6008')
+  ANALYTICS_GRPC_URL: Joi.string().default('localhost:6008'),
+  OPENAI_API_KEY: Joi.string().optional(),
+  OPENAI_MODEL: Joi.string().default('gpt-4o-mini')
 });
 
 export type CommonEnv = {
@@ -50,4 +52,6 @@ export type CommonEnv = {
   EDU_TRACKER_GRPC_URL: string;
   BILLING_GRPC_URL: string;
   ANALYTICS_GRPC_URL: string;
+  OPENAI_API_KEY?: string;
+  OPENAI_MODEL: string;
 };

@@ -7,6 +7,7 @@ import "common.proto";
 service AICoreService {
   rpc ExecuteFlow(ExecuteFlowRequest) returns (ExecuteFlowResponse);
   rpc GetFlowUsage(GetFlowUsageRequest) returns (GetFlowUsageResponse);
+  rpc ChatMentor(ChatMentorRequest) returns (ChatMentorResponse);
 }
 
 message ExecuteFlowRequest {
@@ -33,4 +34,24 @@ message GetFlowUsageResponse {
   int64 prompt_tokens = 2;
   int64 completion_tokens = 3;
   double total_cost_usd = 4;
+}
+
+message ChatMessage {
+  string role = 1;
+  string content = 2;
+}
+
+message ChatMentorRequest {
+  careeros.common.v1.RequestMeta meta = 1;
+  string user_id = 2;
+  string tenant_id = 3;
+  string mode = 4;
+  repeated ChatMessage messages = 5;
+}
+
+message ChatMentorResponse {
+  string message = 1;
+  string model = 2;
+  int32 prompt_tokens = 3;
+  int32 completion_tokens = 4;
 }

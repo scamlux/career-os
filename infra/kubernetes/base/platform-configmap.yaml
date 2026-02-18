@@ -11,3 +11,5 @@ data:
   JWT_ACCESS_SECRET: dev-access-secret-change-me
   JWT_REFRESH_SECRET: dev-refresh-secret-change-me
   OTEL_EXPORTER_OTLP_ENDPOINT: http://otel-collector.careeros.svc.cluster.local:4317
+  AI_CORE_GRPC_URL: ai-core-service.careeros.svc.cluster.local:50051
+  OPENAI_MODEL: gpt-4o-mini

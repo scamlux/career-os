@@ -51,6 +51,22 @@ CREATE TABLE roadmap_skills (
   PRIMARY KEY (roadmap_id, skill_key)
 );
 
+CREATE TABLE roadmap_drafts (
+  id UUID PRIMARY KEY,
+  user_id UUID NOT NULL,
+  tenant_id UUID NOT NULL,
+  title VARCHAR(255) NOT NULL DEFAULT 'Roadmap draft',
+  target_role VARCHAR(255) NOT NULL DEFAULT '',
+  target_grade VARCHAR(64) NOT NULL DEFAULT '',
+  status VARCHAR(32) NOT NULL DEFAULT 'DRAFT',
+  interview_log_json JSONB NOT NULL DEFAULT '[]'::jsonb,
+  roadmap_nodes_json JSONB NOT NULL DEFAULT '[]'::jsonb,
+  canvas_viewport_json JSONB NOT NULL DEFAULT '{"x":0,"y":0,"scale":1}'::jsonb,
+  created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+  updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
+);
+
 CREATE INDEX idx_roadmaps_user_id ON roadmaps(user_id);
 CREATE INDEX idx_stages_roadmap_id ON stages(roadmap_id);
 CREATE INDEX idx_milestones_stage_id ON milestones(stage_id);
+CREATE INDEX idx_roadmap_drafts_user_id ON roadmap_drafts(user_id);

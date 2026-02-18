@@ -1,6 +1,7 @@
 'use client';
 
 import { Dialog, DialogPanel } from '@headlessui/react';
+import type { Route } from 'next';
 import { useRouter } from 'next/navigation';
 import { useEffect, useMemo, useState } from 'react';
 import { mainNav, instructorNav, adminNav, orgNav } from '@/shared/navigation/routes';
@@ -53,7 +54,7 @@ export function CommandPalette() {
                 className="flex w-full items-center justify-between rounded-md px-3 py-2 text-left text-sm text-muted hover:bg-bg hover:text-text"
                 onClick={() => {
                   toggle(false);
-                  router.push(item.href);
+                  router.push(item.href as Route);
                 }}
               >
                 <span>{item.label}</span>
